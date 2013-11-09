@@ -12,7 +12,7 @@ public class Sensorship extends Activity implements SensorEventListener
     private Sensor sensor;
     private String sensorName;
     private TextView text;
-    private float[] lastSent;
+    private float[] lastSent = {0, 0, 0, 0, 0, 0, 0};
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
