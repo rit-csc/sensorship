@@ -1,3 +1,0 @@
-# view AndroidManifest.xml #generated:8
--keep class edu.rit.cs.csc.sensorship.Sensorship { <init>(...); }
-
