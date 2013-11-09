@@ -2,6 +2,7 @@ package game;
 import java.lang.String;
 
 public class Player {
+    private int id;
 	private int curr_x;
 	private int curr_y;
 	private String player_name;
@@ -20,7 +21,24 @@ public class Player {
     	this.heading = heading;
     }
 
+    public int getHeading() {
+        return this.heading;
+    }
+
+    public void setVelocity(int velocity) {
+        this.velocity = velocity;
+    }
+
+    public int getVelocity() {
+        return this.velocity;
+    }
+
+    public void setPos(int x, int y) {
+        this.curr_x = x;
+        this.curr_y = y;
+    }
+
     public String toString() {
-    	return "{" + player_name + ":" + curr_x + "," + curr_y + "}";
+    	return "{" + player_name + ":" + curr_x + "," + curr_y + "," + heading + "}";
     }
 }
