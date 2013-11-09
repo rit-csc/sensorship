@@ -59,12 +59,13 @@ public class Sensorship extends Activity implements SensorEventListener
 
     public boolean shouldUpdate( float[] prevValues, SensorEvent theEvent ){
         float[] compValues = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+        boolean toReturn = true;
         for( int i = 0; i < theEvent.values.length; i++ ){
             float change = Math.abs(prevValues[i]-theEvent.values[i]);
-            if(compValues[i]!=Float.NaN && change < compValues[i]){
-                return false;
+            if(change < compValues[i]){
+                toReturn = false;
             }
         }
-        return true;
+        return toReturn;
     }
 }
