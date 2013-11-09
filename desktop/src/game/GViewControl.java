@@ -3,51 +3,55 @@ package game;
 import javax.swing.*;   // JButton, JFrame
 
 import java.awt.*;  // BorderLayout, Container, Color
-import java.awt.event.*; //ActionListener, ActionEvent
+//import java.awt.event.*; //ActionListener, ActionEvent
 import java.util.*; //Observable, Observer
 
-class GViewControl extends JFrame implements Observer{
+class GViewControl {
+	private static final long SLEEP_TIME_MS = 100;
+	public static final int WINDOW_WIDTH = 500;
+	public static final int WINDOW_HEIGHT = 500;
+	private static final int SHIP_RAD = 30;
 
-	private static GameModel model;
-	private static GViewControl view;
-	//private static Grid grid;
+	private static ArrayList<Player> ships = new ArrayList<Player>();
+	private static Graphics drawable = null;
 
-	public GViewControl( GameModel theModel ){
-		model = theModel;
-		model.addObserver(this);
-	}
-    
-    public void update(Observable t, Object o){
-    	//
-    }
-
-    public static void main(String[] args){
-    	System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
-
-    	model = new GameModel();
-    	view = new GViewControl( model );
+    public static void main(String[] args) throws InterruptedException{
+    	//System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 
     	//create outer frame for game display
 		JFrame frame = new JFrame("SensorSHIP");
-		/*
-		frame.setSize(500, 500);
+		frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 		frame.setLocation(100, 100);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		//get content pane of the frame
-		Container container = frame.getContentPane();
-		
-		//set the border layout for the frame
-		container.setLayout(new GridLayout(GameModel.GRID_DIMENSION, GameModel.GRID_DIMENSION));
-		for(int row = 0; row < GameModel.GRID_DIMENSION; row++){
-			for(int col = 0; col < GameModel.GRID_DIMENSION; col++){
-				JButton aLabel = new JButton("help");
-				aLabel.setBackground(Color.BLUE);
-				container.add( aLabel );
+		frame.setContentPane(new JPanel() {
+			@Override
+			public void paintComponent(Graphics drawable) {
+				super.paintComponent(drawable);
+
+				setBackground(Color.BLACK);
+				drawable.setColor(Color.WHITE);
+				for(Player each : ships) {
+					int[] coords = each.getCartesianPos();
+					//float[] coords = {(float)Math.random()*WINDOW_WIDTH, (float)Math.random()*WINDOW_HEIGHT};
+					drawable.fillOval(coords[0], coords[1], SHIP_RAD, SHIP_RAD);
+					each.advance();
+				}
 			}
-		}
-		*/
-		//display the window
+		});
+		Container container = frame.getContentPane();
+		//System.out.println(String.valueOf(frame.getGraphics()));
+		drawable = container.getGraphics();
 		frame.setVisible(true);
+		container.setVisible(true);
+
+		ships.add(new Player(0, 0, 0));
+		ships.get(0).updateVelocityVectorPolar(1.8, 5);
+
+		while(true) {
+			frame.repaint();
+			Thread.sleep(SLEEP_TIME_MS);
+		}
     }
 }

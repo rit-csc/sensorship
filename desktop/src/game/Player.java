@@ -4,59 +4,63 @@ package game;
  *   Player class for representing a player in-game
  */
 public class Player {
+	private static final int VELOCITY_REDUCTION_FACTOR = 2;
+
+	private int id;
 	private int curr_x;
 	private int curr_y;
-	private String player_name;
-	private int x_velocity;
-        private int y_velocity;
+	private double direction;
+	private int velocity;
 
     /**
      *   Constructor
      */
-    public Player(String player_name, int init_x, int init_y) {
-    	this.player_name = player_name;
+    public Player(int id, int init_x, int init_y) {
+    	this.id = id;
     	this.curr_x = init_x;
     	this.curr_y = init_y;
-    	this.x_velocity = 0;
-        this.y_velocity = 0;
+    	this.direction = 0;
+        this.velocity = 0;
     }
 
     /**
      *   sets the velocities of a player
      */
-    public void setVelocity(int x, int y) {
-        this.x_velocity = x;
-        this.y_velocity = y;
+    public void updateVelocityVectorPolar(double dd, int nv) {
+		direction += dd;
+		direction %= 2*3.14;
+		velocity = nv/2;
+		System.out.println(direction+" "+velocity);
     }
 
     /**
      *   retrieves a velocity for a player
      */
-    public int[] getVelocity() {
-        int velocity[] = {this.x_velocity,this.y_velocity};
-        return velocity;
-    }
-
-    /**
-     *   sets a new position for a player
-     */
-    public void setPos(int x, int y) {
-        this.curr_x = x;
-        this.curr_y = y;
+    private int[] getCartesianVect() {
+        return new int[] {(int)(velocity*Math.cos(direction)), (int)(velocity*Math.sin(direction))};
     }
 
     /**
      *    gets the position of a player
      */
-    public int[] getPos() {
+    public int[] getCartesianPos() {
         int pos[] = {this.curr_x,this.curr_y};
         return pos;
     }
+
+	public void advance() {
+		int[] deltas = getCartesianVect();
+		System.out.println(java.util.Arrays.toString(deltas));
+		curr_x += deltas[0];
+		curr_x %= GViewControl.WINDOW_WIDTH;
+		curr_y += deltas[1];
+		curr_y %= GViewControl.WINDOW_HEIGHT;
+	}
 
     /**
      *     used for printing a character object to the screen.
      */
     public String toString() {
-    	return "{" + player_name + ":" + curr_x + "," + curr_y + "}";
+    	return "{" + id + ":" + curr_x + "," + curr_y + "}";
     }
 }
