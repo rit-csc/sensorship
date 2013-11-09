@@ -65,7 +65,6 @@ public class Sensorship extends Activity implements SensorEventListener
         //simple layout setup
         setContentView(R.layout.main);
         //static sensor type for now
-        android.util.Log.i("create", "ed");
         sensorName = "TYPE_ACCELEROMETER";
 
         criteriaBySensor.put(Sensor.TYPE_ACCELEROMETER, new SensorCriteria(null, new float[][] {{5, 5, 5}}));
