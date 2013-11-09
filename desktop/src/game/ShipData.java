@@ -15,12 +15,12 @@ public class ShipData {
      *  Constructor
      */
     public ShipData(ArrayList<String> players) {
-    	int j = 0;
+    	this.players = new ArrayList<Player>();
+        int j = 0;
     	for (int i = 0; i < players.size(); i++) {
     		this.players.add(new Player(players.get(i),i*10,j*5));
     		j+=1;
     	}
-    	System.out.println(""+this.players);
     }
 
     /**
