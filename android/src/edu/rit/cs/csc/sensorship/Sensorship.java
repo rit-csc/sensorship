@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.hardware.*;
 import android.widget.*;
+import edu.rit.cs.csc.sensorship.deltaforce.DeltaForceRequest;
 
 public class Sensorship extends Activity implements SensorEventListener
 {
@@ -11,7 +12,7 @@ public class Sensorship extends Activity implements SensorEventListener
     private Sensor sensor;
     private String sensorName;
     private TextView text;
-    private float[] currValues;
+    private float[] lastSent;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -42,14 +43,28 @@ public class Sensorship extends Activity implements SensorEventListener
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        //called when accurracy of sensor has changed (tells you if you must callibrate)
     }
 
     public void onSensorChanged(SensorEvent event) {
-        //store values retrieved by sensor as current values
-        currValues = event.values;
-        String outValues = "1) " + currValues[0] + "\n2)" + currValues[1] + "\n3)" + currValues[2];
-        //change textview
-        text.setText(outValues);
+        if( shouldUpdate( lastSent, event )){
+            lastSent = event.values;
+            //outvalues = "1) " + lastSent[0] + "\n2)" + lastSent[1] + "\n3)" + lastSent[2];
+            //text.setText(outValues);
+            float[][] formattedLastSent = {lastSent};
+            DeltaForceRequest newRequest = new DeltaForceRequest( sensorName, formattedLastSent );
+            text.setText( "" + newRequest );
+        }
+    }
+
+    public boolean shouldUpdate( float[] prevValues, SensorEvent theEvent ){
+        float[] compValues = {0.0f, Float.NaN, 5.0f, 6.0f, Float.NaN};
+        for( int i = 0; i < theEvent.values.length; i++ ){
+            float change = Math.abs(prevValues[i]-theEvent.values[i]);
+            if(compValues[i]!=Float.NaN && change < compValues[i]){
+                return false;
+            }
+        }
+        return true;
     }
 }
