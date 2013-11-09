@@ -8,14 +8,14 @@ import java.util.*;
  * Actually, it just represents such a request.
  */
 public class DeltaForceRequest {
-	public String sensorName;
+	public int sensorType;
 	public float[][] deltaVectors;
 	
 	/**
 	 * Construct from actual data (desktop does this)
 	 */
-	public DeltaForceRequest(String sensorName, float[][] deltaVectors) {
-		this.sensorName = sensorName;
+	public DeltaForceRequest(int sensorType, float[][] deltaVectors) {
+		this.sensorType = sensorType;
 		this.deltaVectors = deltaVectors;
 	}
 	
@@ -26,7 +26,7 @@ public class DeltaForceRequest {
 		// Parts are: sensor name and delta array array
 		String[] parts = req.split(":");
 		
-		this.sensorName = parts[0];
+		this.sensorType = Integer.parseInt(parts[0]);
 		
 		String[] deltaVectorStrings = parts[1].split(" or ");
 		
@@ -55,7 +55,7 @@ public class DeltaForceRequest {
 		StringBuilder sb = new StringBuilder();
 		
 		// Add the sensor name
-		sb.append(sensorName);
+		sb.append(Integer.toString(sensorType));
 		sb.append(":");
 		
 		// Add all the delta vectors

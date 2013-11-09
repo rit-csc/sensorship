@@ -24,8 +24,11 @@ class SensorCriteria {
 }
 
 class RequestThread extends Thread {
-    public RequestThread() {
-        
+    Sensorship instance = null;
+    
+    public RequestThread(Sensorship instance) {
+        // Oh my god.
+        this.instance = instance;
     }
     
     public void run() {
@@ -35,9 +38,29 @@ class RequestThread extends Thread {
                 // Block and wait for the desktop to give us a request
                 Socket desktop = server.accept();
                 
+                if(Sensorship.master == null) {
+                    Sensorship.master = desktop.getInetAddress();
+                    Socket outgoingSocket = new Socket(desktop.getInetAddress(), DeltaForceConfig.PORT);
+                    Sensorship.outgoing = new PrintWriter(outgoingSocket.getOutputStream());
+                }
+                
                 BufferedReader in = new BufferedReader(new InputStreamReader(desktop.getInputStream()));
                 String inLine = in.readLine();
                 Log.i("request", "Desktop sent sensor request: " + inLine);
+                
+                DeltaForceRequest req = new DeltaForceRequest(inLine);
+                
+                synchronized(Sensorship.criteriaBySensor) {
+                    SensorCriteria criteria = new SensorCriteria(null, req.deltaVectors);
+                    
+                    if(!Sensorship.criteriaBySensor.containsKey(req.sensorType)) {
+                        SensorManager manager = (SensorManager)instance.getSystemService(Sensorship.SENSOR_SERVICE);
+                        Sensor sensor = manager.getDefaultSensor(req.sensorType);
+                        manager.registerListener(instance, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+                    }
+                    Sensorship.criteriaBySensor.put(req.sensorType, criteria);
+                }
+                
             }
         } catch(IOException e) {
             
@@ -49,32 +72,26 @@ public class Sensorship extends Activity implements SensorEventListener
 {
     private SensorManager sensorManager;
     private Sensor sensor;
-    private String sensorName;
     private TextView text;
     private float[] lastSent = null;
-    private Map<Integer, SensorCriteria> criteriaBySensor = new HashMap<Integer, SensorCriteria>();
+    public static Map<Integer, SensorCriteria> criteriaBySensor = new HashMap<Integer, SensorCriteria>();
+    
+    public static InetAddress master = null;
+    // public static Socket outgoingSocket = null;
+    public static PrintWriter outgoing = null;
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        RequestThread reqThread = new RequestThread();
+        RequestThread reqThread = new RequestThread(this);
         reqThread.start();
         
         //parent constructor call
         super.onCreate(savedInstanceState);
         //simple layout setup
         setContentView(R.layout.main);
-        //static sensor type for now
-        sensorName = "TYPE_ACCELEROMETER";
 
-        criteriaBySensor.put(Sensor.TYPE_ACCELEROMETER, new SensorCriteria(null, new float[][] {{5, 5, 5}}));
-
-        //create sensor manager and get the specified sensor
-        sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        if (sensorName.equals("TYPE_ACCELEROMETER")) {
-            sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        }
-        sensorManager.registerListener(this,sensor,SensorManager.SENSOR_DELAY_NORMAL);
         //retrieve the textview by its id for later use
         text = (TextView)findViewById(R.id.sensor_data_text);
     }
@@ -88,22 +105,28 @@ public class Sensorship extends Activity implements SensorEventListener
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        //called when accurracy of sensor has changed (tells you if you must callibrate)
+        //called when accurracy of sensor has changed (tells you if you must calibrate)
     }
 
     public void onSensorChanged(SensorEvent event) {
-        SensorCriteria criteria = criteriaBySensor.get(event.sensor.getType());
-        if( criteria.lastSent == null || shouldUpdate( event.values, criteria )){
-            //outvalues = "1) " + lastSent[0] + "\n2)" + lastSent[1] + "\n3)" + lastSent[2];
-            //text.setText(outValues);
-            // criteria.lastSent = event.values;
-            criteria.lastSent = new float[event.values.length];
-            for(int i = 0; i < criteria.lastSent.length; ++i) {
-                criteria.lastSent[i] = event.values[i];
+        synchronized(criteriaBySensor) {
+            SensorCriteria criteria = criteriaBySensor.get(event.sensor.getType());
+            if( criteria.lastSent == null || shouldUpdate( event.values, criteria )){
+                //outvalues = "1) " + lastSent[0] + "\n2)" + lastSent[1] + "\n3)" + lastSent[2];
+                //text.setText(outValues);
+                // criteria.lastSent = event.values;
+                criteria.lastSent = new float[event.values.length];
+                for(int i = 0; i < criteria.lastSent.length; ++i) {
+                    criteria.lastSent[i] = event.values[i];
+                }
+                //float[][] formattedLastSent = {lastSent};
+                //DeltaForceRequest newRequest = new DeltaForceRequest( sensorName, formattedLastSent );
+                text.setText( "" + Arrays.toString(event.values) );
+                
+                // outgoing should not be null; it can't be
+                outgoing.println(event.sensor.getType() + ":" + Arrays.toString(event.values));
+                outgoing.flush();
             }
-            //float[][] formattedLastSent = {lastSent};
-            //DeltaForceRequest newRequest = new DeltaForceRequest( sensorName, formattedLastSent );
-            text.setText( "" + Arrays.toString(event.values) );
         }
     }
 
@@ -111,16 +134,11 @@ public class Sensorship extends Activity implements SensorEventListener
        outer:
        for( float[] deltaVector : criteria.deltaVectors ) {
             for( int i = 0; i < newValues.length; i++ ){
-                // android.util.Log.d("this", i+" "+);
-                android.util.Log.d("this", newValues[i] + ", " + criteria.lastSent[i]);
                 float change = Math.abs(newValues[i]-criteria.lastSent[i]);
-                android.util.Log.d("this", i+" "+change);
                 if(change < deltaVector[i]){
-                    android.util.Log.d("this", "failed");
                     continue outer; // try another deltaVector
                 }
             }
-            android.util.Log.i("this", "worked");
             return true; // this deltaVector matched
         }
         return false;

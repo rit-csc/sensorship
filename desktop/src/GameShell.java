@@ -95,6 +95,7 @@ public class GameShell {
 				PrintWriter out = new PrintWriter(toDevice.getOutputStream());
 				
 				out.println(reqStr);
+				out.flush();
 			}
 		}
 	}
