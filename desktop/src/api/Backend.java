@@ -39,7 +39,9 @@ class Backend {
 			out.println(reqNotStr);
 			out.flush();
 		}
-		catch(IOException exException) {}
+		catch(IOException exException) {
+			System.err.println("I couldn't actually connect.");
+		}
 	}
 
 	private static class ClientThread extends Thread {
@@ -64,7 +66,6 @@ class Backend {
 				while((inLine = in.readLine()) != null) {
 					DeltaForceRequest deconstruction = new DeltaForceRequest(inLine);
 					Registrar.invokeListener(playerNum, deconstruction.sensorType, deconstruction.deltaVectors);
-					System.out.printf("Player %d says: %s\n", playerNum, inLine); // TODO don't *ship* with this
 				}
 			} catch(IOException e) {
 				
