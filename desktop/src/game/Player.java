@@ -9,14 +9,19 @@ import api.SensorConstants;
  */
 public class Player implements Listener {
 	private static final int VELOCITY_MAGNIFICATION_FACTOR = 3;
-	private static final float GRAV_TOLERANCE_X = 2;
-	private static final float GRAV_TOLERANCE_Z = 2;
+	private static final float GRAV_TOLERANCE_X = 0.25f;
+	private static final float GRAV_TOLERANCE_Z = 0.25f;
 
-	private int id;
-	private int curr_x;
-	private int curr_y;
+	private float id;
+	private float curr_x;
+	private float curr_y;
 	private double direction;
 	private int velocity;
+
+	public synchronized void TEMP_CLEAR_DIRECTION() {
+		direction=0.0;
+		System.out.println("REALLIGNED");
+	}
 
     /**
      *   Constructor
@@ -51,16 +56,16 @@ public class Player implements Listener {
      *    gets the position of a player
      */
     public synchronized int[] getCartesianPos() {
-        int pos[] = {this.curr_x,this.curr_y};
+        int pos[] = {(int)this.curr_x,(int)this.curr_y};
         return pos;
     }
 
 	public synchronized void advance() {
 		int[] deltas = getCartesianVect();
 		System.out.println(java.util.Arrays.toString(deltas));
-		curr_x += deltas[0];
+		curr_x += deltas[0]+GViewControl.WINDOW_WIDTH;
 		curr_x %= GViewControl.WINDOW_WIDTH;
-		curr_y += deltas[1];
+		curr_y += deltas[1]+GViewControl.WINDOW_HEIGHT;
 		curr_y %= GViewControl.WINDOW_HEIGHT;
 	}
 
@@ -72,6 +77,6 @@ public class Player implements Listener {
     }
 
 	public void sensorUpdated(int player, int sensor, float[] incoming) {
-		updateVelocityVectorPolar(incoming[0], (int)incoming[2]); //direction is x, magnitude is z
+		updateVelocityVectorPolar(-incoming[0], (int)incoming[2]); //direction is x, magnitude is z
 	}
 }

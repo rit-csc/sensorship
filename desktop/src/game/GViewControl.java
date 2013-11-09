@@ -49,6 +49,15 @@ public class GViewControl {
 		ships.add(new Player(0, 0, 0));
 		//ships.get(0).updateVelocityVectorPolar(1.8, 5);
 
+		new Thread() {
+			@Override
+			public void run() {
+				java.util.Scanner blah=new java.util.Scanner(System.in);
+				while(blah.nextLine()!=null)
+					ships.get(0).TEMP_CLEAR_DIRECTION();
+			}
+		}.start();
+
 		try {
 			while(true) {
 				frame.repaint();
