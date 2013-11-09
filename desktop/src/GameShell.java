@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import edu.rit.cs.csc.sensorship.deltaforce.DeltaForceConfig;
+import edu.rit.cs.csc.sensorship.deltaforce.DeltaForceRequest;
 import api.Listener;
 import api.Registrar;
 
@@ -34,8 +34,8 @@ public class GameShell implements Listener {
 			} else if(tok[0].equals("request")) {
 				int playerNum = Integer.parseInt(tok[1]);
 				System.out.print("\nEnter request string: ");
-				String reqStr = scan.nextLine();
-				
+				DeltaForceRequest req = new DeltaForceRequest(scan.nextLine());
+				Registrar.registerListener(playerNum, req.sensorType, req.deltaVectors, new GameShell());
 			}
 		}
 	}
