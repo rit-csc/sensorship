@@ -47,7 +47,7 @@ class GViewControl {
 		container.setVisible(true);
 
 		ships.add(new Player(0, 0, 0));
-		ships.get(0).updateVelocityVectorPolar(1.8, 5);
+		//ships.get(0).updateVelocityVectorPolar(1.8, 5);
 
 		while(true) {
 			frame.repaint();

@@ -1,6 +1,6 @@
 package api;
 
-class SensorConstants{
+public class SensorConstants{
 	public static final int TYPE_ACCELEROMETER = 1;
 	public static final int TYPE_AMBIENT_TEMPERATURE = 13;
 	public static final int TYPE_GAME_ROTATION_VECTOR = 15;
