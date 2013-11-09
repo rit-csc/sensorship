@@ -3,8 +3,12 @@ package edu.rit.cs.csc.sensorship;
 import android.app.Activity;
 import android.os.Bundle;
 import android.hardware.*;
+import android.util.Log;
 import android.widget.*;
-import edu.rit.cs.csc.sensorship.deltaforce.DeltaForceRequest;
+
+import edu.rit.cs.csc.sensorship.deltaforce.*;
+import java.net.*;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +20,28 @@ class SensorCriteria {
     public SensorCriteria(float[] lastSent, float[][] deltaVectors) {
         this.lastSent = lastSent;
         this.deltaVectors = deltaVectors;
+    }
+}
+
+class RequestThread extends Thread {
+    public RequestThread() {
+        
+    }
+    
+    public void run() {
+        try {
+            ServerSocket server = new ServerSocket(DeltaForceConfig.PORT);
+            while(true) {
+                // Block and wait for the desktop to give us a request
+                Socket desktop = server.accept();
+                
+                BufferedReader in = new BufferedReader(new InputStreamReader(desktop.getInputStream()));
+                String inLine = in.readLine();
+                Log.i("request", "Desktop sent sensor request: " + inLine);
+            }
+        } catch(IOException e) {
+            
+        }
     }
 }
 
@@ -31,6 +57,9 @@ public class Sensorship extends Activity implements SensorEventListener
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+        RequestThread reqThread = new RequestThread();
+        reqThread.start();
+        
         //parent constructor call
         super.onCreate(savedInstanceState);
         //simple layout setup
