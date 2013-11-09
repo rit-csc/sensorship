@@ -9,12 +9,12 @@ import java.util.*;
  */
 public class DeltaForceRequest {
 	public String sensorName;
-	public double[][] deltaVectors;
+	public float[][] deltaVectors;
 	
 	/**
 	 * Construct from actual data (desktop does this)
 	 */
-	public DeltaForceRequest(String sensorName, double[][] deltaVectors) {
+	public DeltaForceRequest(String sensorName, float[][] deltaVectors) {
 		this.sensorName = sensorName;
 		this.deltaVectors = deltaVectors;
 	}
@@ -30,7 +30,7 @@ public class DeltaForceRequest {
 		
 		String[] deltaVectorStrings = parts[1].split(" or ");
 		
-		double[][] deltaVectors = new double[deltaVectorStrings.length][];
+		float[][] deltaVectors = new float[deltaVectorStrings.length][];
 		
 		for(int i = 0; i < deltaVectors.length; ++i) {
 			deltaVectors[i] = fromArrStr(deltaVectorStrings[i]);
@@ -39,15 +39,15 @@ public class DeltaForceRequest {
 		this.deltaVectors = deltaVectors;
 	}
 	
-	private double[] fromArrStr(String arrStr) {
-		String[] doubleStrArr = arrStr.substring(1, arrStr.length() - 1).split(", ");
-		double[] doubleArr = new double[doubleStrArr.length];
+	private float[] fromArrStr(String arrStr) {
+		String[] floatStrArr = arrStr.substring(1, arrStr.length() - 1).split(", ");
+		float[] floatArr = new float[floatStrArr.length];
 		
-		for(int i = 0; i < doubleStrArr.length; ++i) {
-			doubleArr[i] = Double.parseDouble(doubleStrArr[i]);
+		for(int i = 0; i < floatStrArr.length; ++i) {
+			floatArr[i] = Float.parseFloat(floatStrArr[i]);
 		}
 		
-		return doubleArr;
+		return floatArr;
 	}
 	
 	public String toString() {
@@ -60,7 +60,7 @@ public class DeltaForceRequest {
 		
 		// Add all the delta vectors
 		String prefix = "";
-		for(double[] deltaVector : deltaVectors) {
+		for(float[] deltaVector : deltaVectors) {
 			sb.append(prefix);
 			prefix = " or ";
 			sb.append(Arrays.toString(deltaVector));
