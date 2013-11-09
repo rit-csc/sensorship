@@ -19,4 +19,5 @@ public class SensorConstants{
 	public static final int TYPE_SIGNIFICANT_MOTION = 17;
 	public static final int TYPE_STEP_COUNTER = 19;
 	public static final int TYPE_STEP_DETECTOR = 18;
+	public static final int TYPE_ORIENTATION = 3;
 }

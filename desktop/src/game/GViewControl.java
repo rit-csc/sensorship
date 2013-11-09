@@ -6,6 +6,8 @@ import java.awt.*;  // BorderLayout, Container, Color
 //import java.awt.event.*; //ActionListener, ActionEvent
 import java.util.*; //Observable, Observer
 
+import api.Registrar;
+
 public class GViewControl {
 	private static final long SLEEP_TIME_MS = 100;
 	public static final int WINDOW_WIDTH = 500;
@@ -33,10 +35,10 @@ public class GViewControl {
 				setBackground(Color.BLACK);
 				drawable.setColor(Color.WHITE);
 				for(Player each : ships) {
-					int[] coords = each.getCartesianPos();
 					//float[] coords = {(float)Math.random()*WINDOW_WIDTH, (float)Math.random()*WINDOW_HEIGHT};
-					drawable.fillOval(coords[0], coords[1], SHIP_RAD, SHIP_RAD);
-					each.advance();
+					// drawable.fillOval(coords[0], coords[1], SHIP_RAD, SHIP_RAD);
+					float[] xAndY = each.xAndY();
+					drawable.drawRect((int)xAndY[0], (int)xAndY[1], Player.PADDLE_WIDTH, Player.PADDLE_HEIGHT);
 				}
 			}
 		});
@@ -45,18 +47,12 @@ public class GViewControl {
 		drawable = container.getGraphics();
 		frame.setVisible(true);
 		container.setVisible(true);
-
-		ships.add(new Player(0, 0, 0));
-		//ships.get(0).updateVelocityVectorPolar(1.8, 5);
-
-		new Thread() {
-			@Override
-			public void run() {
-				java.util.Scanner blah=new java.util.Scanner(System.in);
-				while(blah.nextLine()!=null)
-					ships.get(0).TEMP_CLEAR_DIRECTION();
-			}
-		}.start();
+		
+		// ships.add(new Player(0));
+		
+		for(int i = 0; i < Registrar.numPlayers(); ++i) {
+			ships.add(new Player(i));
+		}
 
 		try {
 			while(true) {
