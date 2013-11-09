@@ -3,66 +3,12 @@ import java.net.*;
 import java.util.*;
 
 import edu.rit.cs.csc.sensorship.deltaforce.DeltaForceConfig;
+import api.Listener;
+import api.Registrar;
 
-class ClientThread extends Thread {
-	// dat security
-	private Socket client;
-	
-	public ClientThread(Socket client) {
-		this.client = client;
-	}
-	
-	public void run() {
-		if(!GameShell.playerNumToAddress.contains(client.getInetAddress())) {
-			System.err.println("WHO THE FUCK HANDED ME AN INVALID CLIENT ADDRESS");
-			return;
-		}
-		
-		int playerNum = GameShell.playerNumToAddress.indexOf(client.getInetAddress());
-		try {
-			// What the fuck
-			BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			String inLine;
-			while((inLine = in.readLine()) != null) {
-				System.out.printf("Player %d says: %s\n", playerNum, inLine);
-			}
-		} catch(IOException e) {
-			
-		}
-	}
-}
-
-class ServerThread extends Thread {
-	public ServerThread() {
-		
-	}
-	
-	public void run() {
-		try {
-			ServerSocket server = new ServerSocket(DeltaForceConfig.PORT);
-			while(true) {
-				Socket client = server.accept();
-				
-				ClientThread clientThread = new ClientThread(client);
-				clientThread.start();
-			}
-		} catch(IOException e) {
-			
-		}
-	}
-}
-
-public class GameShell {
-	static List<InetAddress> playerNumToAddress = new ArrayList<InetAddress>();
-		
-	static Map<InetAddress, Integer> addressToPlayerNum = new HashMap<InetAddress, Integer>();
-	
+public class GameShell implements Listener {
 	public static void main(String[] args) throws IOException {
 		Scanner scan = new Scanner(System.in);
-		
-		// Spin up the server thread to hear our tablets
-		ServerThread server = new ServerThread();
-		server.start();
 		
 		String inLine;
 		screen:
@@ -83,20 +29,18 @@ public class GameShell {
 					continue;
 				}
 				
-				playerNumToAddress.add(device);
-				addressToPlayerNum.put(device, playerNumToAddress.size() - 1);
+				// Don't delete this line... it's imPORTant!
+				System.out.println("Device assigned player number "+Registrar.addPlayer(device));
 			} else if(tok[0].equals("request")) {
 				int playerNum = Integer.parseInt(tok[1]);
 				System.out.print("\nEnter request string: ");
 				String reqStr = scan.nextLine();
 				
-				Socket toDevice = new Socket(playerNumToAddress.get(playerNum), DeltaForceConfig.PORT);
-				
-				PrintWriter out = new PrintWriter(toDevice.getOutputStream());
-				
-				out.println(reqStr);
-				out.flush();
 			}
 		}
+	}
+
+	public void sensorUpdated(int playah, int sensah, float[] resultah) {
+		System.out.printf("Player %d: Sensor %d reports %s", playah, sensah, Arrays.toString(resultah));
 	}
 }
