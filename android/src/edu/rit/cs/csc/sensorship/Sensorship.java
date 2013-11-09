@@ -133,7 +133,7 @@ public class Sensorship extends Activity implements SensorEventListener
     public boolean shouldUpdate( float[] newValues, SensorCriteria criteria ){
        outer:
        for( float[] deltaVector : criteria.deltaVectors ) {
-            for( int i = 0; i < newValues.length; i++ ){
+            for( int i = 0; i < deltaVector.length; i++ ){
                 float change = Math.abs(newValues[i]-criteria.lastSent[i]);
                 if(change < deltaVector[i]){
                     continue outer; // try another deltaVector

@@ -1,3 +1,5 @@
+package edu.rit.cs.csc.sensorship.deltaforce;
+
 class SensorConstants{
 
 	public final int TYPE_ACCELEROMETER = 1;
