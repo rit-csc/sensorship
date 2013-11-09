@@ -3,7 +3,6 @@ package edu.rit.cs.csc.sensorship.deltaforce;
 class SensorConstants{
 
 	public final int TYPE_ACCELEROMETER = 1;
-	public final int TYPE_ALL = -1;
 	public final int TYPE_AMBIENT_TEMPERATURE = 13;
 	public final int TYPE_GAME_ROTATION_VECTOR = 15;
 	public final int TYPE_GEOMAGNETIC_ROTATION_VECTOR = 20;
