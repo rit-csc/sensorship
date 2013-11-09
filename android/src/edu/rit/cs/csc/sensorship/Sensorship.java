@@ -5,6 +5,19 @@ import android.os.Bundle;
 import android.hardware.*;
 import android.widget.*;
 import edu.rit.cs.csc.sensorship.deltaforce.DeltaForceRequest;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+class SensorCriteria {
+    public float[] lastSent = null;
+    public float[][] deltaVectors = null;
+
+    public SensorCriteria(float[] lastSent, float[][] deltaVectors) {
+        this.lastSent = lastSent;
+        this.deltaVectors = deltaVectors;
+    }
+}
 
 public class Sensorship extends Activity implements SensorEventListener
 {
@@ -12,7 +25,8 @@ public class Sensorship extends Activity implements SensorEventListener
     private Sensor sensor;
     private String sensorName;
     private TextView text;
-    private float[] lastSent = {0, 0, 0, 0, 0, 0, 0};
+    private float[] lastSent = null;
+    private Map<Integer, SensorCriteria> criteriaBySensor = new HashMap<Integer, SensorCriteria>();
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -22,7 +36,10 @@ public class Sensorship extends Activity implements SensorEventListener
         //simple layout setup
         setContentView(R.layout.main);
         //static sensor type for now
+        android.util.Log.i("create", "ed");
         sensorName = "TYPE_ACCELEROMETER";
+
+        criteriaBySensor.put(Sensor.TYPE_ACCELEROMETER, new SensorCriteria(null, new float[][] {{5, 5, 5}}));
 
         //create sensor manager and get the specified sensor
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
@@ -47,25 +64,37 @@ public class Sensorship extends Activity implements SensorEventListener
     }
 
     public void onSensorChanged(SensorEvent event) {
-        if( shouldUpdate( lastSent, event )){
-            lastSent = event.values;
+        SensorCriteria criteria = criteriaBySensor.get(event.sensor.getType());
+        if( criteria.lastSent == null || shouldUpdate( event.values, criteria )){
             //outvalues = "1) " + lastSent[0] + "\n2)" + lastSent[1] + "\n3)" + lastSent[2];
             //text.setText(outValues);
-            float[][] formattedLastSent = {lastSent};
-            DeltaForceRequest newRequest = new DeltaForceRequest( sensorName, formattedLastSent );
-            text.setText( "" + newRequest );
+            // criteria.lastSent = event.values;
+            criteria.lastSent = new float[event.values.length];
+            for(int i = 0; i < criteria.lastSent.length; ++i) {
+                criteria.lastSent[i] = event.values[i];
+            }
+            //float[][] formattedLastSent = {lastSent};
+            //DeltaForceRequest newRequest = new DeltaForceRequest( sensorName, formattedLastSent );
+            text.setText( "" + Arrays.toString(event.values) );
         }
     }
 
-    public boolean shouldUpdate( float[] prevValues, SensorEvent theEvent ){
-        float[] compValues = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-        boolean toReturn = true;
-        for( int i = 0; i < theEvent.values.length; i++ ){
-            float change = Math.abs(prevValues[i]-theEvent.values[i]);
-            if(change < compValues[i]){
-                toReturn = false;
+    public boolean shouldUpdate( float[] newValues, SensorCriteria criteria ){
+       outer:
+       for( float[] deltaVector : criteria.deltaVectors ) {
+            for( int i = 0; i < newValues.length; i++ ){
+                // android.util.Log.d("this", i+" "+);
+                android.util.Log.d("this", newValues[i] + ", " + criteria.lastSent[i]);
+                float change = Math.abs(newValues[i]-criteria.lastSent[i]);
+                android.util.Log.d("this", i+" "+change);
+                if(change < deltaVector[i]){
+                    android.util.Log.d("this", "failed");
+                    continue outer; // try another deltaVector
+                }
             }
+            android.util.Log.i("this", "worked");
+            return true; // this deltaVector matched
         }
-        return toReturn;
+        return false;
     }
 }
