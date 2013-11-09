@@ -2,9 +2,10 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import edu.rit.cs.csc.sensorship.deltaforce.DeltaForceRequest;
 import api.Listener;
 import api.Registrar;
+import edu.rit.cs.csc.sensorship.deltaforce.DeltaForceRequest;
+import game.GViewControl;
 
 public class GameShell implements Listener {
 	public static void main(String[] args) throws IOException {
@@ -36,6 +37,8 @@ public class GameShell implements Listener {
 				System.out.print("\nEnter request string: ");
 				DeltaForceRequest req = new DeltaForceRequest(scan.nextLine());
 				Registrar.registerListener(playerNum, req.sensorType, req.deltaVectors, new GameShell());
+			} else if(tok[0].equals("game")) {
+				GViewControl.main(null);
 			}
 		}
 	}

@@ -8,7 +8,7 @@ import api.SensorConstants;
  *   Player class for representing a player in-game
  */
 public class Player implements Listener {
-	private static final int VELOCITY_REDUCTION_FACTOR = 2;
+	private static final int VELOCITY_MAGNIFICATION_FACTOR = 3;
 	private static final float GRAV_TOLERANCE_X = 2;
 	private static final float GRAV_TOLERANCE_Z = 2;
 
@@ -36,7 +36,7 @@ public class Player implements Listener {
     public synchronized void updateVelocityVectorPolar(double dd, int nv) {
 		direction += dd;
 		direction %= 2*3.14;
-		velocity = nv/2;
+		velocity = nv*VELOCITY_MAGNIFICATION_FACTOR;
 		System.out.println(direction+" "+velocity);
     }
 

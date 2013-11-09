@@ -6,7 +6,7 @@ import java.awt.*;  // BorderLayout, Container, Color
 //import java.awt.event.*; //ActionListener, ActionEvent
 import java.util.*; //Observable, Observer
 
-class GViewControl {
+public class GViewControl {
 	private static final long SLEEP_TIME_MS = 100;
 	public static final int WINDOW_WIDTH = 500;
 	public static final int WINDOW_HEIGHT = 500;
@@ -15,7 +15,7 @@ class GViewControl {
 	private static ArrayList<Player> ships = new ArrayList<Player>();
 	private static Graphics drawable = null;
 
-    public static void main(String[] args) throws InterruptedException{
+    public static void main(String[] args) {
     	//System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 
     	//create outer frame for game display
@@ -49,9 +49,12 @@ class GViewControl {
 		ships.add(new Player(0, 0, 0));
 		//ships.get(0).updateVelocityVectorPolar(1.8, 5);
 
-		while(true) {
-			frame.repaint();
-			Thread.sleep(SLEEP_TIME_MS);
+		try {
+			while(true) {
+				frame.repaint();
+				Thread.sleep(SLEEP_TIME_MS);
+			}
 		}
+		catch(InterruptedException ex) {}
     }
 }
