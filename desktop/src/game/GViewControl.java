@@ -23,10 +23,11 @@ class Ball {
 }
 
 public class GViewControl {
-	private static final long SLEEP_TIME_MS = 100;
-	public static final int WINDOW_WIDTH = 500;
-	public static final int WINDOW_HEIGHT = 500;
-	private static final int BALL_RAD = 30;
+        private static final int SCALE_FACTOR = 2;
+	private static final long SLEEP_TIME_MS = 25;
+	public static final int WINDOW_WIDTH = 500*SCALE_FACTOR;
+	public static final int WINDOW_HEIGHT = 500*SCALE_FACTOR;
+	private static final int BALL_RAD = 30*SCALE_FACTOR;
 	
 	public static final double BALL_SPEED = 8.0;
 	

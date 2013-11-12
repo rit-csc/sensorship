@@ -8,8 +8,9 @@ import api.SensorConstants;
  *   Player class for representing a player in-game
  */
 public class Player implements Listener {
-    public static final int PADDLE_WIDTH = 10;
-    public static final int PADDLE_HEIGHT = 80;
+    public static final int SCALE_FACTOR = 2;
+    public static final int PADDLE_WIDTH = 10*SCALE_FACTOR;
+    public static final int PADDLE_HEIGHT = 80*SCALE_FACTOR;
     
     private static final float DONT_CARE = 0.0f;
 	private static final float GRAV_TOLERANCE_Z = 0.1f;
